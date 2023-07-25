@@ -13,6 +13,7 @@ import time
 import threading
 from pathlib import Path
 from typing import Callable
+import logging
 
 from uds.config import Config
 from uds.factories import TpFactory
@@ -132,12 +133,25 @@ class Uds(object):
 
         # Note: in automated mode (unlikely to be used any other way), there is no response from tester present, so threading is not an issue here.
         response = None
-        
-        if responseRequired:
-            while True:
-                response = self.tp.recv(self.__P2_CAN_Client)
-                if not ((response[0] == 0x7F) and (response[2] == 0x78)):
-                    break
+
+        #used for counting number of messages
+        count = 0
+        #timer used of receiving 0x78 messages ()
+        elapsed = 0 ##TODO not defined a constant value
+        # total time to receive response pending messages
+        total_time = 0
+        #modified code to get the response pending messages and checks interval does not exceed 3.5sec 
+        while responsePending and elapsed < 10:
+            response = self.tp.recv(self.__P2_CAN_Client)
+            if ((response[0] == 0x7F) and (response[2] == 0x78)):
+                total_time =  time.perf_counter() - t1
+                count = count + 1
+                logging.info(f"UDS response received {['0x{:02X}'.format(i) for i in response]}")
+                if total_time/count > 3.5:
+                    logging.exception("response pending took more than 3.5 sec") 
+            else:
+                return response
+            elapsed = time.perf_counter() - t1
 
         # If the diagnostic session control service is supported, record the sending time for possible use by the tester present functionality (again, if present) ...
         if hasattr(self, "sessionSetLastSend"):
