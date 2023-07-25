@@ -141,7 +141,7 @@ class Uds(object):
         # total time to receive response pending messages
         total_time = 0
         #modified code to get the response pending messages and checks interval does not exceed 3.5sec 
-        while responsePending and elapsed < 10:
+        while responseRequired and elapsed < 20:
             response = self.tp.recv(self.__P2_CAN_Client)
             if ((response[0] == 0x7F) and (response[2] == 0x78)):
                 total_time =  time.perf_counter() - t1
