@@ -133,7 +133,7 @@ class Uds(object):
 
         # Note: in automated mode (unlikely to be used any other way), there is no response from tester present, so threading is not an issue here.
         response = None
-
+        t1 = time.perf_counter()
         #used for counting number of messages
         count = 0
         #timer used of receiving 0x78 messages ()
