@@ -146,7 +146,7 @@ class Uds(object):
             if ((response[0] == 0x7F) and (response[2] == 0x78)):
                 total_time =  time.perf_counter() - t1
                 count = count + 1
-                logging.info(f"UDS response received {['0x{:02X}'.format(i) for i in response]}")
+                logging.info(f"UDS response pending message received {['0x{:02X}'.format(i) for i in response]}")
                 if total_time/count > 3.5:
                     logging.exception("response pending took more than 3.5 sec") 
             else:
